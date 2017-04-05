@@ -1,0 +1,48 @@
+################################################################################
+################################################################################
+##                                                                            ##
+##                        Electronic Coupling Program                         ##
+##                                                                            ##
+##                               Sean M. Ryno                                 ##
+##                                                                            ##
+##                             November 8, 2016                               ##
+##                                                                            ##
+##                                                                            ##
+## Usage: transfer_integral.py system_name [g09/orca/qchem]                   ##
+##                             optional([homo1] [lumo1] [homo2] [lumo2])      ##
+##                                                                            ##
+## Here, homo[1/2], lumo[1/2] are the upper and lower bounds of orbital of    ##
+##       interest for monomer [1/2] using the orbital numbering of            ##
+##       monomer [1/2]. All possible combinations of couplings will be        ##
+##       calculated.                                                          ##
+##                                                                            ##
+## Note: This program makes use of components of the gauss_parse.py           ##
+##       program of J. J. Goings                                              ##
+##                                                                            ##
+## Note: The output files from calculations of dimer and monomers must        ##
+##       include molecular orbital coefficients and the dimer overlap matrix  ##
+##       in addition to standard output                                       ##
+##                                                                            ##
+## Note: Program auto-detects restricted or unrestricted calculations         ##
+##       and provide respective couplings                                     ##
+##                                                                            ##
+## Note: For combined Gaussian jobs, the dimer calculation must come first.   ##
+##                                                                            ##
+## Note: Gaussian must adopt the following naming convention:                 ##
+##       dimer: *_A_B.fchk & *_A_B.log                                        ##
+##       monomer 1: *_A.fchk                                                  ##
+##       monomer 2: *_B.fchk                                                  ##
+##                                                                            ##
+## Gaussian keywords: # b3lyp/6-31g** nosymm pop=full iop(3/33=1,3/32=2)      ##
+##                                                                            ##
+## Additional Orca keywords: print[ P_mos ] 1 & print[ P_overlap ] 1          ##
+##                                                                            ##
+## Q-Chem $rem section must include:                                          ##
+##       iprint            200                                                ##
+##       print_orbitals    1000000                                            ##
+##                                                                            ##
+## Based upon: E. F. Valeev, V. Coropceanu, D. A. da Silva Filho, S. Salman,  ##
+##             J. L. Bredas, J. Am. Chem. Soc. 128, 9882-9886 (2006)          ##
+##                                                                            ##
+################################################################################
+################################################################################

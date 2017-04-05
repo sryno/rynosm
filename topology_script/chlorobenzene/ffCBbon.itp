@@ -1,0 +1,20 @@
+[ bondtypes ]
+;  ai   aj    funct      b0[nm]     kb[kJ/mol nm^2]
+   CA    HA      1    0.10800   307105.6
+   CA    CA      1    0.14000   392459.2
+   CA    Cl      1    0.17250   251040.0
+
+[ angletypes ]
+;  ai   aj   ak   funct    theta0     k0(kjmol-1 rad-2)
+   CA     CA     CA      1   120.000    527.184
+   CA     CA     HA      1   120.000    292.880
+   CA     CA     Cl      1   120.000    627.600
+
+[ dihedraltypes ]
+; proper dihedrals
+;  ai   aj   ak    al   funct    c0        c1        c2         c3        c4        c5(kj/mol) 
+    X      CA     CA     X       3     30.33400   0.00000 -30.33400   0.00000   0.00000   0.00000
+
+[ dihedraltypes ]
+; Improper dihedrals
+#define improper_Z_Y_CA_X            180.0        4.6024     2

@@ -1,0 +1,148 @@
+[ bondtypes ]
+;  ai   aj    funct      b0[nm]     kb[kJ/mol nm^2]
+   C7   C7      1        0.1424        392459.2 ; OPLS-AA CS CS
+   C5   C7      1        0.1448        334720.0 ; OPLS-AA C  CS
+   C6   C7      1        0.1377        392459.2 ; OPLS-AA CW CS
+   C5   N1      1        0.1426        349782.4 ; OPLS-AA C  NA
+   C6   N1      1        0.1392        349782.4 ; OPLS-AA C  NA
+   C4   N1      1        0.1446        282001.6 ; OPLS-AA CT NA
+   C5   O1      1        0.1219        476976.0 ; OPLS-AA CT NA
+   C4   H3      1        0.1083        284512.0 ; OPLS-AA CT HC
+   C1   C1      1        0.1452        328268.3 ; Huang C1 C1
+   C1   C2      1        0.1375        430341.1 ; Huang C1 C2
+   C1   S1      1        0.1737        243718.0 ; Huang C1 S1
+   C1   C6      1        0.1446        328268.3 ; Huang C1 C1
+   C2   C2      1        0.1414        379154.1 ; Huang C2 C2
+   C2   H2      1        0.1083        310143.2 ; Huang C2 H2
+   C1   H1      1        0.1082        310143.2 ; Huang C3 H2
+   C1   C10     1        0.1452        328268.3 ; Huang C1 C1
+   C10  C11     1        0.1375        430341.1 ; Huang C1 C2
+   C10  S2      1        0.1737        243718.0 ; Huang C1 S1
+   C11  C11     1        0.1414        379154.1 ; Huang C2 C2
+   C11  H2      1        0.1083        310143.2 ; Huang C2 H2
+   C10  C10     1        0.1452        328268.3 ; Huang C1 C1
+   C10  H1      1        0.1082        310143.2 ; Huang C3 H2
+   C10  C8      1        0.1500        265265.6 ; Huang C2 C4
+   C8   H4      1        0.1097        284512.0 ; Huang C4 H3
+   C8   C9      1        0.1536        224262.4 ; Huang C4 C5
+   C9   H4      1        0.1099        284512.0 ; Huang C5 H3
+   C8   C8      1        0.1529        224262.4 ; Huang C5 C5
+   C9   C9      1        0.1528        224262.4 ; Huang C5 C5
+
+
+[ angletypes ]
+;  ai   aj   ak   funct    theta0     k0(kjmol-1 rad-2)
+   C7   C7   C5     1      108.184       585.760 ; OPLS-AA CS CS CW
+   C7   C7   C6     1      109.206       585.760 ; OPLS-AA CS CS CW
+   C5   N1   C6     1      111.580       585.760 ; OPLS-AA CW NA CW
+   C5   N1   C4     1      119.502       585.760 ; OPLS-AA CW NA CT
+   C7   C5   N1     1      103.696       585.760 ; OPLS-AA CW CW NA
+   C7   C6   N1     1      107.331       585.760 ; OPLS-AA CW CW NA
+   C7   C5   O1     1      133.269       585.760 ; OPLS-AA CS C  O
+   C6   C7   C5     1      142.606       585.760 ; OPLS-AA CW CS CW
+   C7   C6   C1     1      128.845       457.679 ; Huang C1 C1 C2
+   N1   C5   O1     1      123.036       669.440 ; OPLS-AA NA C  O
+   N1   C6   C1     1      123.824       585.760 ; OPLS-AA CW CW NA
+   C4   N1   C6     1      128.683       585.760 ; OPLS-AA CW NA CT
+   N1   C4   H3     1      109.675       292.880 ; OPLS-AA HC CT NA
+   S1   C1   C2     1      110.787       722.660 ; Huang S1 C1 C2
+   C1   C2   C2     1      113.225       331.222 ; Huang C1 C2 C2
+   C1   C2   H2     1      123.323       295.081 ; Huang C1 C2 H1
+   C6   C1   C2     1      139.269       457.679 ; Huang C1 C1 C2
+   C1   S1   C1     1       91.969       772.660 ; Huang C1 S1 C1
+   C6   C1   S1     1      119.774       349.280 ; Huang C1 C1 S1
+   C2   C2   H2     1      123.426       295.081 ; Huang C2 C2 H1
+   C1   C1   S1     1      120.601       349.280 ; Huang C1 C1 S1
+   C1   C1   C2     1      128.540       457.679 ; Huang C1 C1 C2
+   H3   C4   H3     1      109.238       276.144 ; OPLS-AA HC CT HC
+   S1   C1   H1     1      119.969       240.890 ; Huang S1 C3 H2
+   C2   C1   H1     1      127.951       295.081 ; Huang S1 C3 H2
+   C10  C1   S1     1      120.601       349.280 ; Huang C1 C1 S1
+   C10  C1   C2     1      128.540       457.679 ; Huang C1 C1 C2
+   C1   C10  C11    1      128.540       457.679 ; Huang C1 C1 C2
+   C1   C10  S2     1      120.601       349.280 ; Huang C1 C1 S1
+   S2   C10  C11    1      110.787       722.660 ; Huang S1 C1 C2
+   C10  C11  C11    1      113.225       331.222 ; Huang C1 C2 C2
+   C10  C11  H2     1      123.323       295.081 ; Huang C1 C2 H1
+   C10  S2   C10    1       91.969       772.660 ; Huang C1 S1 C1
+   C11  C11  H2     1      123.426       295.081 ; Huang C2 C2 H1
+   C10  C10  S2     1      120.601       349.280 ; Huang C1 C1 S1
+   C10  C10  C11    1      128.540       457.679 ; Huang C1 C1 C2
+   S2   C10  H1     1      119.969       240.890 ; Huang S1 C3 H2
+   C11  C10  H1     1      127.951       295.081 ; Huang S1 C3 H2
+   S2   C10  C8     1      121.334       722.660 ; Huang S1 C1 C2
+   C11  C10  C8     1      128.154       457.679 ; Huang C1 C1 C2
+   C10  C8   H4     1      108.982       292.880 ; Huang C2 C4 H3
+   C10  C8   C9     1      113.612       527.184 ; Huang C2 C4 C5
+   H4   C8   H4     1      106.380       276.144 ; Huang H3 C4 H3
+   C9   C8   H4     1      109.310       313.800 ; Huang C5 C4 H3
+   C8   C9   H4     1      109.159       313.800 ; Huang C4 C5 H3
+   C8   C9   C9     1      112.561       488.273 ; Huang C4 C5 C5
+   H4   C9   H4     1      106.204       276.144 ; Huang H3 C5 H3
+   C9   C9   H4     1      109.379       313.800 ; Huang C5 C5 H3
+   C9   C9   C9     1      113.152       488.273 ; Huang C5 C5 C5
+   C10  C8   C10    1      112.970       334.720 ; OPLS-AA CA CT CA
+   C10  C8   C8     1      112.865       527.184 ; Huang C2 C4 C5
+   C8   C8   H4     1      109.183       313.800 ; Huang C5 C4 H3
+   C8   C9   C8     1      111.575       488.273 ; Huang C5 C5 C5
+
+
+[ dihedraltypes ]
+; proper dihedrals
+;  ai   aj   ak    al   funct    c0        c1        c2         c3        c4        c5(kj/mol) 
+   X    C7   C7    X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   X    C7   C6    X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CW X
+   X    C7   C5    X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CW X
+   X    C6   N1    X      3     11.715    0.000    -11.715     0.000     0.000     0.000 ; OPLS-AA X  CW NA X
+   X    C5   N1    X      3     11.715    0.000    -11.715     0.000     0.000     0.000 ; OPLS-AA X  CW NA X
+   C5   N1   C4    H3     3      0.000    0.000      0.000     0.000     0.000     0.000 ; OPLS-AA CW NA CT HC
+   C6   N1   C4    H3     3      0.000    0.000      0.000     0.000     0.000     0.000 ; OPLS-AA CW NA CT HC
+   X    C1   C2    X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   X    C2   C2    X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   X    S1   C1    X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   X    C10  C11   X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   X    S2   C10   X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   X    C11  C11   X      3     30.334    0.000    -30.334     0.000     0.000     0.000 ; OPLS-AA X  CS CS X
+   H4   C9   C8    H4     3      0.628    1.883      0.000    -2.510     0.000     0.000 ; Huang H3 C5 C4 H3
+   H4   C9   C9    H4     3      0.628    1.883      0.000    -2.510     0.000     0.000 ; Huang H3 C5 C5 H3
+   C9   C9   C8    H4     3      0.628    1.883      0.000    -2.510     0.000     0.000 ; Huang C5 C5 C4 H3
+   C8   C9   C9    H4     3      0.628    1.883      0.000    -2.510     0.000     0.000 ; Huang C4 C5 C5 H3
+   C9   C9   C9    H4     3      0.628    1.883      0.000    -2.510     0.000     0.000 ; Huang C5 C5 C5 H3
+   C10  C8   C9    H4     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Huang C2 C4 C5 H3
+   C10  C8   C8    H4     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Huang C2 C4 C5 H3
+;   C8   C9   C9    C9     3      2.929   -1.464      0.209    -1.674     0.000     0.000 ; Huang C4 C5 C5 C5
+;   C9   C9   C9    C9     3      2.929   -1.464      0.209    -1.674     0.000     0.000 ; Huang C5 C5 C5 C5
+;   C10  C8   C9    C9     3      2.929   -1.464      0.209    -1.674     0.000     0.000 ; Huang C2 C4 C5 C5
+   N1   C6   C1    S1     3      0.000    0.000      0.000     0.000     0.000     0.000 ; DPP-Th torsion
+   S1   C1   C10   S2     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Th-Th torsion adjacent to DPP
+   S2   C10  C10   S2     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Th-Th torsion
+   S2   C10  C8    C9     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Th-Alkyl
+   C10  C8   C9    C9     3      0.000    0.000      0.000     0.000     0.000     0.000 ; C10-Alkyl
+   C10  C8   C9    C8     3      0.000    0.000      0.000     0.000     0.000     0.000 ; C10-Alkyl - short
+   C8   C9   C9    C8     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Alkyl Adjacent Th - short
+   C8   C9   C9    C9     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Alkyl Adjacent Th
+   C9   C9   C9    C9     3      0.000    0.000      0.000     0.000     0.000     0.000 ; Alkyl Bridge
+   C10  C8   C8    C10    3      0.000    0.000      0.000     0.000     0.000     0.000 ; Alkyl Bridge - short
+   X    C6   C1    X      3      0.000    0.000      0.000     0.000     0.000     0.000 ; Intended to be left 0
+   X    C1   C10   X      3      0.000    0.000      0.000     0.000     0.000     0.000 ; Intended to be left 0
+   X    C10  C10   X      3      0.000    0.000      0.000     0.000     0.000     0.000 ; Intended to be left 0
+   X    C10  C8    X      3      0.000    0.000      0.000     0.000     0.000     0.000 ; Intended to be left 0
+   X    C8   C8    X      3      0.000    0.000      0.000     0.000     0.000     0.000 ; Intended to be left 0
+   X    C8   C9    X      3      0.000    0.000      0.000     0.000     0.000     0.000 ; Intended to be left 0
+
+
+
+[ dihedraltypes ]
+; Improper dihedrals
+#define improper_Z_Y_CA2_X           180.0        10.460     2
+#define improper_Z_Y_CN_X            180.0        10.460     2
+#define improper_Z_Y_N1_X            180.0        10.460     2
+#define improper_Z_Y_CS3_X           180.0        10.460     2
+#define improper_Z_Y_C2_X            180.0        10.460     2
+#define improper_Z_Y_C7_X            180.0        10.460     2
+#define improper_Z_Y_CW1_X           180.0        10.460     2
+#define improper_Z_Y_C1_X            180.0        10.460     2
+#define improper_Z_Y_C5_X            180.0        10.460     2
+#define improper_Z_Y_C6_X            180.0        10.460     2
+#define improper_Y_X_C_O1            180.0        43.932     2
+#define improper_Y_X_C5_O1           180.0        43.932     2

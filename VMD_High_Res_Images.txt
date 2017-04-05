@@ -1,0 +1,19 @@
+To render high-quality images with VMD:
+
+1. Open desired structure in VMD on local workstation.
+2. Set image to orientation and desired representations.
+3. Go to Extensions -> Visualization -> ViewMaster
+4. Select Create New. This will save the current view.
+5. Go to File -> Save Visualization State...
+6. Save state to state.vmd 
+6. Close VMD.
+7. Open Visualization State File.
+8. Edit path to molecule to that of file location on cluster.
+9. Copy Visualization State File to cluster.
+10. Request interactive job on GPU node. (e.g., on Holly: salloc -N 1 -n 12 -t 04:00:00 -gres gpu:2 --exclusive -p pgpu)
+11. Run VMD in text mode loadint visualization state. (e.g., vmd -dispdev text -e /path/to/state.vmd)
+12. Turn off axes if desired (axes location off).
+13. Render high-resolution image. (render Tachyon molecule ~/bin/vmd_files/tachyon_LINUXAMD64 molecule -aasamples 12 -format TARGA -res 8000 8000 -o molecule.tga)
+	- Rendering can takes minutes to hours.
+14. Open molecule.tga in image editor, such as GIMP.
+15. Save image as PNG.

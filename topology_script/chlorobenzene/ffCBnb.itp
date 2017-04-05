@@ -1,0 +1,6 @@
+[ atomtypes ]
+;name  bond_type    at.num       mass         charge        ptype       sigma[nm]         eps[kJ/mol]
+ CHCA   CA             6       12.01100    -0.115       A    3.55000e-01  2.92880e-01
+ CHHA   HA             1       1.00800     0.115       A    2.42000e-01  1.25520e-01
+ CHAA   CA             6       12.01100     0.180       A    3.55000e-01  2.92880e-01
+ CHCl   Cl            17       35.45300    -0.180       A    3.40000e-01  1.25520e+00
