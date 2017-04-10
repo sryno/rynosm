@@ -363,6 +363,9 @@ def writeLammps(molID, x1, y1, z1, dA, mNames, cAxes, fileOut):
     fout = open(fileOut + '.lammpstrj', 'w')
     nAtm = molID.shape[0]
 
+    print("ITEM: TIMESTEP", file=fout)
+    print("0", file=fout)
+
     print("ITEM: NUMBER OF ATOMS", file=fout)
     print(int(nAtm), file=fout)
 
@@ -379,8 +382,8 @@ def writeLammps(molID, x1, y1, z1, dA, mNames, cAxes, fileOut):
 
     print("ITEM: ATOMS id type xu yu zu da", file=fout)
     for i in range(nAtm):
-        print("{0:d} {1:d} {2:.5f} {3:.5f} {4:.5f} {5:s}".format(i, molID[i], x1[i], y1[i], z1[i], dA[mNames[i]]),
-              file=fout)
+        print("{0:d} {1:d} {2:.5f} {3:.5f} {4:.5f} {5:s}".format(i, molID[i], x1[i], y1[i], z1[i], dA[mNames[i]]), file=fout)
+        #print("{0:d} {1:d} {2:.5f} {3:.5f} {4:.5f}".format(i, molID[i], x1[i], y1[i], z1[i]), file=fout)
 
 
 
@@ -423,8 +426,6 @@ if __name__ == '__main__':
     moleculeIDs, numMolecules = cy_new_molecule_ID(connections, len(x))
     #moleculeIDs, numMolecules = new_molecule_ID(connections, len(x))
     print("Molecule IDs Done.", file=sys.stdout)
-
-    x, y, z = cy_angToNm(x, y, z)
 
     if vars(args)['conn'] == True:
         print("Writing atom connections.", file=sys.stdout)
