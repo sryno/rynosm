@@ -21,26 +21,31 @@ __status__ = 'Development'
 def parseGro(inFile):
     fin = open(inFile, 'r')
 
-    mName, aName, x, y, z, cAxes = [], [], [], [], [], 0
+    mName, aName, x, y, z, cAxes = [], [], [], [], [], []
 
     fin.readline()
     nAtoms = int(fin.readline().strip())
     for line in fin:
         try:
-            float(line.split()[0])
-            cAxes = [line.split()[0], line.split()[1], line.split()[2], line.split()[3], line.split()[4],
-                     line.split()[5], line.split()[6], line.split()[7], line.split()[8]]
+            cAxes = [float(line.split()[0]), float(line.split()[1]), float(line.split()[2]), float(line.split()[3]), float(line.split()[4]), float(line.split()[5]), float(line.split()[6]), float(line.split()[7]), float(line.split()[8])]
             break
         except (ValueError, IndexError):
+            pass
+        if len(cAxes) != 9:
             try:
-                temp = line.split()[1]
-                mName.append(line[5:10].strip())
-                aName.append(line[10:15].strip())
-                x.append(float(line[20:28].strip()))
-                y.append(float(line[28:36].strip()))
-                z.append(float(line[36:44].strip()))
+                cAxes = [float(line.split()[0]), float(line.split()[1]), float(line.split()[2])]
+                break
             except (ValueError, IndexError):
                 pass
+        try:
+            temp = line.split()[1]
+            mName.append(line[5:10].strip())
+            aName.append(line[10:15].strip())
+            x.append(float(line[20:28].strip()))
+            y.append(float(line[28:36].strip()))
+            z.append(float(line[36:44].strip()))
+        except (ValueError, IndexError):
+            pass
 
     return nAtoms, mName, aName, x, y, z, cAxes
 
@@ -48,7 +53,7 @@ def parseGro(inFile):
 def assignElements(aNames):
     elmnts = np.ndarray.tolist(np.zeros(len(aNames)).astype(str))
 
-    for i in range(len(atomNames)):
+    for i in range(len(aNames)):
         if aNames[i][:2].upper() == 'CL':
             elmnts[i] = 'Cl'
         elif aNames[i][0].upper() == 'H':
@@ -354,6 +359,31 @@ def writeStruct(molID, x1, y1, z1, dA, mNames, fileOut):
     return
 
 
+def writeLammps(molID, x1, y1, z1, dA, mNames, cAxes, fileOut):
+    fout = open(fileOut + '.lammpstrj', 'w')
+    nAtm = molID.shape[0]
+
+    print("ITEM: NUMBER OF ATOMS", file=fout)
+    print(int(nAtm), file=fout)
+
+    if len(cAxes) == 9:
+        print("ITEM: BOX BOUNDS xy xz yz xx yy zz", file=fout)
+        print("{0:<8.4f} {1:<8.4f} {2:<8.4f}".format(0.0, float(cAxes[0])*10, cAxes[5]*10), file=fout)
+        print("{0:<8.4f} {1:<8.4f} {2:<8.4f}".format(0.0, float(cAxes[1])*10, cAxes[7]*10), file=fout)
+        print("{0:<8.4f} {1:<8.4f} {2:<8.4f}".format(0.0, float(cAxes[2])*10, cAxes[8]*10), file=fout)
+    elif len(cAxes) == 3:
+        print("ITEMS: BOX BOUNDS xx yy zz", file=fout)
+        print("{0:<8.4f} {1:<8.4f}".format(0.0, float(cAxes[0]) * 10), file=fout)
+        print("{0:<8.4f} {1:<8.4f}".format(0.0, float(cAxes[1]) * 10), file=fout)
+        print("{0:<8.4f} {1:<8.4f}".format(0.0, float(cAxes[2]) * 10), file=fout)
+
+    print("ITEM: ATOMS id type xu yu zu da", file=fout)
+    for i in range(nAtm):
+        print("{0:d} {1:d} {2:.5f} {3:.5f} {4:.5f} {5:s}".format(i, molID[i], x1[i], y1[i], z1[i], dA[mNames[i]]),
+              file=fout)
+
+
+
 if __name__ == '__main__':
     """
     Reads in a Gromacs GRO file and outputs XYZ, Connections, and Molecule IDs.
@@ -362,10 +392,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Reads in a Gromacs GRO file and outputs XYZ, Connections, and Molecule IDs.')
     parser.add_argument('INPUT_FILE', nargs=1, help='Input Gromacs File Name')
     parser.add_argument('OUTPUT_NAME', nargs=1, help='Name Prefix for Output Files')
-    parser.add_argument('-maxatm', nargs=1, help="Sets the maximum molecule size. Default: 150", default=['150'])
-    parser.add_argument('-maxbnd', nargs=1, help="Sets the maximum number of bonds an atom can have. Default: 4", default=['4'])
-    parser.add_argument('-conn', action='store_true', help="Turn on outputting of atom connections.")
-    parser.add_argument('-mol', action='store_true', help="Turn on outputting of molecule ID to separate file.")
+    parser.add_argument('-ma', '--maxatm', nargs=1, help="Sets the maximum molecule size. Default: 150", default=['150'])
+    parser.add_argument('-mb', '--maxbnd', nargs=1, help="Sets the maximum number of bonds an atom can have. Default: 4", default=['4'])
+    parser.add_argument('-c', '--conn', action='store_true', help="Turn on outputting of atom connections.")
+    parser.add_argument('-m', '--mol', action='store_true', help="Turn on outputting of molecule ID to separate file.")
+    parser.add_argument('-l', '--lammps', action='store_true', help="Turn on output in LAMMPS format.")
     args = parser.parse_args()
 
     max_atoms_molecule = int(vars(args)['maxatm'][0])
@@ -406,4 +437,8 @@ if __name__ == '__main__':
 
     print("Writing output structure file.", file=sys.stdout)
     writeStruct(moleculeIDs, x, y, z, donorAcceptor, molNames, vars(args)['OUTPUT_NAME'][0])
+
+    if vars(args)['lammps'] == True:
+        print("Write output in Lammps format.", file=sys.stdout)
+        writeLammps(moleculeIDs, x, y, z, donorAcceptor, molNames, cryAxes, vars(args)['OUTPUT_NAME'][0])
 
