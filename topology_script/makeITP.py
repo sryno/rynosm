@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import argparse
-
+import sys
 from scipy import *
 from scipy.sparse import *
 
@@ -122,6 +122,7 @@ def parseBon(itpFile):
     bonds = []
     angles = []
     dihedrals = []
+    proper_dihedrals = []
     impropers = []
     fin = open(itpFile, 'r')
     for line in fin:
@@ -136,14 +137,18 @@ def parseBon(itpFile):
         elif (len(line.split()) == 6) or ((len(line.split()) >= 7) and (line.split()[6] == ';')):
             line = line.split()
             angles.append([line[0], line[1], line[2], line[3], line[4], line[5]])
-        elif (len(line.split()) == 11) or ((len(line.split()) >= 12) and (line.split()[11] == ';')):
+        elif ((len(line.split()) == 11) and (line.split()[4] == '3')) or \
+                ((len(line.split()) > 11) and (line.split()[11] == ';')):
             line = line.split()
             dihedrals.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9],
                               line[10]])
+        elif ((len(line.split()) == 8) and (int(line.split()[4]) == 9)) or ((len(line.split()) > 8) and (line.split()[8] == ';') and (int(line.split()[4]) == 9)):
+            line = line.split()
+            proper_dihedrals.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7]])
         else:
             pass
 
-    return bonds, angles, dihedrals, impropers
+    return bonds, angles, dihedrals, proper_dihedrals, impropers
 
 
 def findElements(atomTypes, nb):
@@ -424,9 +429,16 @@ def assignTypes(nb, atomType, bonds, angles, dihedral):
 
 
 def printTopol(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihedrals, bondParams, angleParams,
-               dihedralParams, improperPrint, gaussCharges):
+               properDihedralParams, dihedralParams, improperPrint, gaussCharges):
     fout = open(outFile, 'w')
     mout = open(outFile + '.missing', 'w')
+
+    # Append Proper Dihedrals to RB Dihedrals
+    allDihedralParams = []
+    for i in properDihedralParams:
+        allDihedralParams.append(i)
+    for i in dihedralParams:
+        allDihedralParams.append(i)
 
     # Assign Atom Types
     bondTypes, angleTypes, dihedralTypes = assignTypes(nb, atomType, bonds, angles, dihedrals)
@@ -446,7 +458,7 @@ def printTopol(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihe
     if len(gaussCharges) == 0:
         for i in range(len(atomNum)):
             print(
-                '{0:>6d}{1:>8s}{2:>6d}{3:>7s}{4:>15s}{5:>9d}{6:>10.3f}{7:>10.3f}'.format(atomNum[i], atomType[i],
+                '{0:>6d}{1:>8s}{2:>6d}{3:>7s}{4:>15s}{5:>9d}{6:>14.6f}{7:>10.3f}'.format(atomNum[i], atomType[i],
                                                                                          resNum[i],
                                                                                          name[i], nb[atomType[i]][0],
                                                                                          atomNum[i], nb[atomType[i]][3],
@@ -454,7 +466,7 @@ def printTopol(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihe
     else:
         for i in range(len(atomNum)):
             print(
-                '{0:>6d}{1:>8s}{2:>6d}{3:>7s}{4:>15s}{5:>9d}{6:>10.3f}{7:>10.3f}'.format(atomNum[i], atomType[i],
+                '{0:>6d}{1:>8s}{2:>6d}{3:>7s}{4:>15s}{5:>9d}{6:>14.6f}{7:>10.3f}'.format(atomNum[i], atomType[i],
                                                                                          resNum[i],
                                                                                          name[i], nb[atomType[i]][0],
                                                                                          atomNum[i], gaussCharges[i],
@@ -554,7 +566,7 @@ def printTopol(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihe
         file=fout)
     for i in range(len(dihedrals)):
         missing = 1
-        for j in dihedralParams:
+        for j in allDihedralParams:
             if ([dihedralTypes[i][0], dihedralTypes[i][1], dihedralTypes[i][2], dihedralTypes[i][3]] == [j[0], j[1],
                                                                                                          j[2], j[3]]) \
                     or ([dihedralTypes[i][0], dihedralTypes[i][1], dihedralTypes[i][2], dihedralTypes[i][3]] == [j[3],
@@ -583,11 +595,16 @@ def printTopol(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihe
             else:
                 pass
         if missing == 0:
-            print(
-                '{0:>6d}{1:>6d}{2:>6d}{3:>6d}{4:>6d}{5:>15.6f}{6:>15.6f}{7:>15.6f}{8:>15.6f}{9:>15.6f}{10:>15.6f}  ; {11:>6s}{12:>6s}{13:>6s}{14:>6s}'.format(
-                    dihedrals[i][0] + 1, dihedrals[i][1] + 1, dihedrals[i][2] + 1, dihedrals[i][3] + 1, int(j[4]),
-                    float(j[5]), float(j[6]), float(j[7]), float(j[8]), float(j[9]), float(j[10]), dihedralTypes[i][0],
-                    dihedralTypes[i][1], dihedralTypes[i][2], dihedralTypes[i][3]), file=fout)
+            if len(j) == 11:
+                print('{0:>6d}{1:>6d}{2:>6d}{3:>6d}{4:>6d}{5:>15.6f}{6:>15.6f}{7:>15.6f}{8:>15.6f}{9:>15.6f}{10:>15.6f}  ; {11:>6s}{12:>6s}{13:>6s}{14:>6s}'.format(
+                        dihedrals[i][0] + 1, dihedrals[i][1] + 1, dihedrals[i][2] + 1, dihedrals[i][3] + 1, int(j[4]),
+                        float(j[5]), float(j[6]), float(j[7]), float(j[8]), float(j[9]), float(j[10]), dihedralTypes[i][0],
+                        dihedralTypes[i][1], dihedralTypes[i][2], dihedralTypes[i][3]), file=fout)
+            elif len(j) == 8:
+                print('{0:>6d}{1:>6d}{2:>6d}{3:>6d}{4:>6d}{5:>15.6f}{6:>15.6f}{7:>15d}  ; {8:>6s}{9:>6s}{10:>6s}{11:>6s}'.format(
+                        dihedrals[i][0] + 1, dihedrals[i][1] + 1, dihedrals[i][2] + 1, dihedrals[i][3] + 1, int(j[4]),
+                        float(j[5]), float(j[6]), int(j[7]), dihedralTypes[i][0], dihedralTypes[i][1],
+                        dihedralTypes[i][2], dihedralTypes[i][3]), file=fout)
         elif missing == 1:
             if ([dihedralTypes[i][0], dihedralTypes[i][1], dihedralTypes[i][2],
                  dihedralTypes[i][3]] not in missingDihedrals) and (
@@ -625,6 +642,64 @@ def printTopol(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihe
     return bondTypes, angleTypes, dihedralTypes
 
 
+def printTopol_noparams(outFile, resNum, name, atomType, atomNum, nb, bonds, angles, dihedrals, gaussCharges):
+    fout = open(outFile, 'w')
+
+    # Begin Writing Topology File
+    print('; Topology file for ', outFile, file=fout)
+    print('', file=fout)
+    print('[ moleculetype ]', file=fout)
+    print('; name     nrexcl', file=fout)
+    print('  ', name[0], '     3', file=fout)
+    print('', file=fout)
+
+    # Print Atoms
+    print('[ atoms ]', file=fout)
+    print(';   nr     type  resnr residue        atom     cgnr    charge     mass', file=fout)
+    if len(gaussCharges) == 0:
+        for i in range(len(atomNum)):
+            print(
+                '{0:>6d}{1:>8s}{2:>6d}{3:>7s}{4:>15s}{5:>9d}{6:>14.6f}{7:>10.3f}'.format(atomNum[i], atomType[i],
+                                                                                         resNum[i],
+                                                                                         name[i], nb[atomType[i]][0],
+                                                                                         atomNum[i], nb[atomType[i]][3],
+                                                                                         nb[atomType[i]][2]), file=fout)
+    else:
+        for i in range(len(atomNum)):
+            print(
+                '{0:>6d}{1:>8s}{2:>6d}{3:>7s}{4:>15s}{5:>9d}{6:>14.6f}{7:>10.3f}'.format(atomNum[i], atomType[i],
+                                                                                         resNum[i],
+                                                                                         name[i], nb[atomType[i]][0],
+                                                                                         atomNum[i], gaussCharges[i],
+                                                                                         nb[atomType[i]][2]), file=fout)
+    print('', file=fout)
+
+    # Print Bonds
+    print('[ bonds ]', file=fout)
+    print(';   ai    aj   funct         c0            c1', file=fout)
+    for i in range(len(bonds)):
+        print('{0:>6d}{1:>6d}'.format(bonds[i][0] + 1, bonds[i][1] + 1), file=fout)
+
+    # Print Angles
+    print('[ angles ]', file=fout)
+    print(';   ai    aj    ak   funct       theta0          k0', file=fout)
+    for i in range(len(angles)):
+        print('{0:>6d}{1:>6d}{2:>6d}     1'.format(angles[i][0] + 1, angles[i][1] + 1, angles[i][2] + 1), file=fout)
+
+    # Print Dihedrals
+    print('[ dihedrals ]', file=fout)
+    print(
+        ';   ai    aj    ak    al   funct           c0             c1             c2             c3             c4             c5',
+        file=fout)
+    for i in range(len(dihedrals)):
+        print(
+                '{0:>6d}{1:>6d}{2:>6d}{3:>6d}     3'.format(
+                    dihedrals[i][0] + 1, dihedrals[i][1] + 1, dihedrals[i][2] + 1, dihedrals[i][3] + 1), file=fout)
+
+    print('; Include Position restraint file', '#ifdef POSRES', '#include "posre.itp"', '#endif', sep='\n',
+          file=fout)
+
+
 def printGro(grOut, resNum, name, atomType, atomNum, x, y, z, nb):
     gout = open(grOut, 'w')
     print(name[0], file=gout)
@@ -647,7 +722,8 @@ def printPosRes(atomNum, elements):
             pass
 
 
-def printFF(nb, bondParams, angleParams, dihedralParams, improperParams, atomType, bonds, angles, dihedrals):
+def printFF(nb, bondParams, angleParams, properDihedralParams, dihedralParams, improperParams, atomType, bonds, angles,
+            dihedrals):
     bondTypes, angleTypes, dihedralTypes = assignTypes(nb, atomType, bonds, angles, dihedrals)
     newBonds = []
     newAngles = []
@@ -668,6 +744,14 @@ def printFF(nb, bondParams, angleParams, dihedralParams, improperParams, atomTyp
         else:
             newDihedrals.append([i[0], i[1], i[2], i[3]])
 
+    # Append Proper Dihedrals to RB Dihedrals
+    allDihedralParams = []
+    for i in properDihedralParams:
+        allDihedralParams.append(i)
+    for i in dihedralParams:
+        allDihedralParams.append(i)
+    # print(allDihedralParams)
+
     nbout = open('ffnb.itp', 'w')
     bonout = open('ffbon.itp', 'w')
 
@@ -677,7 +761,7 @@ def printFF(nb, bondParams, angleParams, dihedralParams, improperParams, atomTyp
         ";       name     bondType   at.num       mass         charge        ptype       sigma[nm]         eps[kJ/mol]",
         file=nbout)
     for i in sorted(nb):
-        print("{0:>12s}{1:>10s}{2:>10d}{3:>14.3f}{4:>14.4f}{5:>11s}{6:>16.4f}{7:>20.6f}".format(i, nb[i][0], nb[i][1],
+        print("{0:>12s}{1:>10s}{2:>10d}{3:>14.3f}{4:>14.6f}{5:>11s}{6:>16.4f}{7:>20.6f}".format(i, nb[i][0], nb[i][1],
                                                                                                 nb[i][2], nb[i][3],
                                                                                                 nb[i][4], nb[i][5],
                                                                                                 nb[i][6]), file=nbout)
@@ -766,37 +850,57 @@ def printFF(nb, bondParams, angleParams, dihedralParams, improperParams, atomTyp
           file=bonout)
     for i in newDihedrals:
         found = False
-        for j in dihedralParams:
+        for j in allDihedralParams:
             if ([i[0], i[1], i[2], i[3]] == [j[0], j[1], j[2], j[3]]) or (
                         [i[3], i[2], i[1], i[0]] == [j[0], j[1], j[2], j[3]]):
-                print(
-                    "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
-                        i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
-                        float(j[9]), float(j[10])), file=bonout)
+                if len(j) == 11:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
+                            float(j[9]), float(j[10])), file=bonout)
+                elif len(j) == 8:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12d}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), int(j[7])), file=bonout)
                 found = True
                 break
             elif ((j[0] == 'X') and ([i[1], i[2], i[3]] == [j[1], j[2], j[3]])) or (
                         (j[0] == 'X') and ([i[2], i[1], i[0]] == [j[1], j[2], j[3]])):
-                print(
-                    "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
-                        i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
-                        float(j[9]), float(j[10])), file=bonout)
+                if len(j) == 11:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
+                            float(j[9]), float(j[10])), file=bonout)
+                elif len(j) == 8:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12d}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), int(j[7])), file=bonout)
                 found = True
                 break
             elif ((j[3] == 'X') and ([i[0], i[1], i[2]] == [j[0], j[1], j[2]])) or (
                         (j[3] == 'X') and ([i[3], i[2], i[1]] == [j[0], j[1], j[2]])):
-                print(
-                    "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
-                        i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
-                        float(j[9]), float(j[10])), file=bonout)
+                if len(j) == 11:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
+                            float(j[9]), float(j[10])), file=bonout)
+                elif len(j) == 8:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12d}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), int(j[7])), file=bonout)
                 found = True
                 break
             elif ((j[0] == 'X') and (j[3] == 'X') and ([i[1], i[2]] == [j[1], j[2]])) or (
                             (j[0] == 'X') and (j[3] == 'X') and ([i[2], i[1]] == [j[1], j[2]])):
-                print(
-                    "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
-                        i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
-                        float(j[9]), float(j[10])), file=bonout)
+                if len(j) == 11:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12.6f}{8:>12.6f}{9:>12.6f}{10:>12.6f}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), float(j[7]), float(j[8]),
+                            float(j[9]), float(j[10])), file=bonout)
+                elif len(j) == 8:
+                    print(
+                        "{0:>6s}{1:>6s}{2:>6s}{3:>6s}{4:>6d}{5:>12.6f}{6:>12.6f}{7:>12d}".format(
+                            i[0], i[1], i[2], i[3], int(j[4]), float(j[5]), float(j[6]), int(j[7])), file=bonout)
                 found = True
                 break
             else:
@@ -804,7 +908,7 @@ def printFF(nb, bondParams, angleParams, dihedralParams, improperParams, atomTyp
         if found == True:
             pass
         elif found == False:
-            print("Match not found:", i)
+            print("Match not found:", i, j)
     print('', file=bonout)
 
     print("[ dihedraltypes ]", file=bonout)
@@ -827,7 +931,7 @@ if __name__ == '__main__':
     parser.add_argument('-out', nargs=1, help='Gromacs .itp Output File.', required=True)
     parser.add_argument('-gout', nargs=1, help='Gromacs .gro Output file.', default='NULL')
     parser.add_argument('-nb', nargs=1, help='Gromacs Non-Bonded .itp Input File.', required=True)
-    parser.add_argument('-bon', nargs=1, help='Gromacs Bonded .itp Input File.', required=True)
+    parser.add_argument('-bon', nargs=1, help='Gromacs Bonded .itp Input File.', default=['NULL'])
     parser.add_argument('-ff', action='store_true',
                         help='Enable rewriting new force field files that remove wildcards.')
     parser.add_argument('-imp', action='store_true', help='Turn on finding impropers defined in -bon file. DO NOT USE!')
@@ -849,10 +953,19 @@ if __name__ == '__main__':
     else:
         gaussCharges = []
 
+    # Sanity Check
+    if (vars(args)['bon'][0] == 'NULL') and (vars(args)['ff'] == True):
+        print("You must define a bonded forcefield to print new formatted forcefield.", file=sys.stderr)
+        print("Exiting...", file=sys.stderr)
+        sys.exit(1)
+
     # Get Parameter Data, Bond, Angles, and Dihedrals
     resNum, name, atomType, atomNum, x, y, z = parseGro(vars(args)['gro'][0])
     nb = parseFF(vars(args)['nb'][0])
-    bondParams, angleParams, dihedralParams, improperParams = parseBon(vars(args)['bon'][0])
+    if vars(args)['bon'][0] != 'NULL':
+        bondParams, angleParams, dihedralParams, properDihedralParams, improperParams = parseBon(vars(args)['bon'][0])
+    else:
+        bondParams, angleParams, dihedralParams, properDihedralParams, improperParams = [], [], [], [], []
     radii, elements = findElements(atomType, nb)
     atomConnects = AtomConnections(len(atomType), x, y, z, radii)
     bonds = findBonds(atomConnects)
@@ -864,13 +977,19 @@ if __name__ == '__main__':
         debugOut = open('debugITP.out', 'w')
         print('resNum', resNum, '', 'name', name, '', 'atomType', atomType, '', 'atomNum', atomNum, '', 'x', x, '', 'y',
               y, '', 'z', z, '', 'elements', elements, '', 'nb', nb, '', 'bondParams', bondParams, '', 'angleParams',
-              angleParams, '', 'dihedralParams', dihedralParams, '', 'improperParams', improperParams, '', 'radii',
-              radii, '', 'bonds', bonds, '', 'angles', angles, '', 'dihedrals', dihedrals, sep='\n', file=debugOut)
+              angleParams, '', 'dihedralParams', dihedralParams, '', 'properDihedralParams', properDihedralParams, '',
+              'improperParams', improperParams, '', 'radii', radii, '', 'bonds', bonds, '', 'angles', angles, '',
+              'dihedrals', dihedrals, sep='\n', file=debugOut)
         sys.exit(0)
 
     # Print Output Files
-    printTopol(vars(args)['out'][0], resNum, name, atomType, atomNum, nb, bonds,
-               angles, dihedrals, bondParams, angleParams, dihedralParams, vars(args)['imp'], gaussCharges)
+    if vars(args)['bon'][0] != 'NULL':
+        printTopol(vars(args)['out'][0], resNum, name, atomType, atomNum, nb, bonds,
+                    angles, dihedrals, bondParams, angleParams, properDihedralParams, dihedralParams,
+                   vars(args)['imp'], gaussCharges)
+    else:
+        printTopol_noparams(vars(args)['out'][0], resNum, name, atomType, atomNum, nb, bonds,
+                   angles, dihedrals, gaussCharges)
 
     # Print Warning About Using the Improper Dihedral Algorithm
     if vars(args)['imp'] == True:
@@ -900,6 +1019,6 @@ if __name__ == '__main__':
 
     # Print new force field files if desired
     if vars(args)['ff'] == True:
-        printFF(nb, bondParams, angleParams, dihedralParams, improperParams, atomType, bonds, angles, dihedrals)
+        printFF(nb, bondParams, angleParams, properDihedralParams, dihedralParams, improperParams, atomType, bonds, angles, dihedrals)
     else:
         pass
