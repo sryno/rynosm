@@ -3,7 +3,7 @@ import sys, os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from scipy.interpolate import spline
+from scipy.interpolate import interp1d
 import argparse
 
 
@@ -11,7 +11,7 @@ __author__ = 'Sean M. Ryno'
 __copyright__ = 'Copyright 2017, Sean M. Ryno'
 __credits__ = 'Sean M. Ryno'
 __license__ = 'GPL v3.0'
-__version__ = '0.1'
+__version__ = '0.2'
 __maintainer__ = 'Sean M. Ryno'
 __email__ = 'sean.m.ryno@gmail.com'
 __status__ = 'Development'
@@ -46,7 +46,8 @@ def plotData(xdata, ydata):
     popt, pcov = curve_fit(rbFunc, xdata, ydata, ftol=1e-15, xtol=1e-15, gtol=1e-15)
     # plt.plot(xdata, rbFunc(xdata, *popt), 'r-', label='fit')
     xnew = np.linspace(min(xdata), max(xdata), 300)
-    xSmooth = spline(xdata, rbFunc(xdata, *popt), xnew)
+    xSmooth = interp1d(xdata, rbFunc(xdata, *popt), kind='cubic')
+    ynew = xSmooth(xnew)
     residuals = ydata - rbFunc(xdata, *popt)
     ss_res = np.sum(residuals**2)
     ss_tot = np.sum((ydata-np.mean(ydata))**2)
@@ -60,7 +61,7 @@ def plotData(xdata, ydata):
     print('C5 = {:>8.3f}'.format(popt[5]))
     print('')
     print('R^2 = {:>7.4f}'.format(r_squared))
-    plt.plot(xnew, xSmooth, 'r-', label='fit')
+    plt.plot(xnew, ynew, 'r-', label='fit')
     plt.xlabel('Angle (radians)')
     plt.ylabel('Energy')
     plt.legend()
@@ -88,4 +89,3 @@ if __name__ == '__main__':
         ang[i] = ang2rad(ang[i])
 
     plotData(ang, val)
-
